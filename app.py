@@ -23,7 +23,7 @@ if uploaded_file is not None:
         st.write(f"Valid input")
         st.dataframe(raw_data)
     else: 
-        st.write(f"Invalid data")
+        st.write(f"Invalid input")
 
 
 
