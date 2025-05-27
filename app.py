@@ -9,13 +9,20 @@ import numpy as np
 
 
 def digitize(df, col, limit) -> pd.Categorical: 
-    pass
+    lower, upper = limit
+    # Get sorted unique non-NaN values from the column
+    unique_vals = sorted(df[col].dropna().unique())
+    # Combine with limits and remove duplicates to form bin edges
+    bin_edges = sorted(set([lower] + unique_vals + [upper]))
+    # Bin the data: closed on left, open on right, returns Categorical
+    digitized = pd.cut(df[col], bins=bin_edges, right=False)
+    return digitized
 
 
 def describe_digitized(y_digitized) -> pd.DataFrame:
     y_desc = y_digitized.describe()
     y_desc = y_desc.reset_index()
-    y_desc.loc[~y_desc.categories.isna(), 'left'] = y_digitized.categories.left
+    y_desc.loc[~y_desc.categories.isna(), 'left'] = y_digitized.categoriess.left
     y_desc.loc[~y_desc.categories.isna(), 'right'] = y_digitized.categories.right
     return y_desc
 
