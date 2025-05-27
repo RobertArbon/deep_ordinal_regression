@@ -10,7 +10,7 @@ def test_digitize1(mocker):
     mock_uploader.return_value = 'tests/data/to_digitize.csv' 
     at = AppTest.from_file('app.py').run()
     at.selectbox[0].set_value('y').run()
-    at.slider[0].set_range((0, 4)).run()
+    at.slider[0].set_range(0, 4).run()
     df = at.dataframe[1].value
     np.testing.assert_equal(df['counts'].values, 1)
     np.testing.assert_array_equal(df['left'].values, np.array([0, 1, 2, 3, 4] ))
