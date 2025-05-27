@@ -9,10 +9,20 @@ import numpy as np
 
 
 def digitize(df, col, limit) -> pd.Categorical: 
-    pass
+    bins = list(np.unique(df[col].values))+[np.inf]
+    bins = sorted(bins)
+    bins = [x for x in bins if ~np.isnan(x)]
+    return pd.cut(df[col].values, 
+                  bins=bins, 
+                  right=False)
+
 
 def describe_digitized(y_digitized) -> pd.DataFrame:
-    pass
+    y_desc = y_digitized.describe()
+    y_desc = y_desc.reset_index()
+    y_desc.loc[~y_desc.categories.isna(), 'left'] = y_digitized.categories.left
+    y_desc.loc[~y_desc.categories.isna(), 'right'] = y_digitized.categories.right
+    return y_desc
 
 def suggest_y_range(df, col): 
     buffer = .1
@@ -36,8 +46,8 @@ def run_model(df):
     y_range_suggestion = suggest_y_range(df, y_col)
     y_range = st.slider("Select Experiment Sensitivity", *y_range_suggestion)
     y_digitized = digitize(df, y_col, y_range)
-    y_description = describe_digitized(y_digitized)
-    st.dataframe(y_description)
+    y_desc = describe_digitized(y_digitized)
+    st.dataframe(y_desc.loc[:, ['left', 'right', 'counts', 'freqs']])
 
 
 uploaded_file = st.file_uploader("Choose a file", )
