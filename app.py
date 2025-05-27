@@ -9,12 +9,7 @@ import numpy as np
 
 
 def digitize(df, col, limit) -> pd.Categorical: 
-    bins = list(np.unique(df[col].values))+[np.inf]
-    bins = sorted(bins)
-    bins = [x for x in bins if ~np.isnan(x)]
-    return pd.cut(df[col].values, 
-                  bins=bins, 
-                  right=False)
+    pass
 
 
 def describe_digitized(y_digitized) -> pd.DataFrame:
