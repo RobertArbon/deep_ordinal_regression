@@ -42,15 +42,22 @@ def validate_input(df):
     return is_valid
 
 def run_model(df):
-    y_col = st.selectbox('Select response variable', list(df.select_dtypes('float').columns))
+    y_col = st.selectbox('Select response variable', list(df.select_dtypes('float').columns),
+                         key='select_response')
+
     y_range_suggestion = suggest_y_range(df, y_col)
-    y_range = st.slider("Select Experiment Sensitivity", *y_range_suggestion)
+
+    y_range = st.slider("Select Experiment Sensitivity", *y_range_suggestion, 
+                        key='select_response_range')
+
     y_digitized = digitize(df, y_col, y_range)
     y_desc = describe_digitized(y_digitized)
-    st.dataframe(y_desc.loc[:, ['left', 'right', 'counts', 'freqs']])
+
+    st.dataframe(y_desc.loc[:, ['left', 'right', 'counts', 'freqs']], key='y_description')
 
 
 uploaded_file = st.file_uploader("Choose a file", )
+
 if uploaded_file is not None:
 
     raw_data = pd.read_csv(uploaded_file)
@@ -59,7 +66,7 @@ if uploaded_file is not None:
 
     if input_is_valid: 
         st.write(f"Valid input")
-        st.dataframe(raw_data)
+        st.dataframe(raw_data, key='raw_data')
     else: 
         st.write(f"Invalid input")
 
