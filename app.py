@@ -8,21 +8,43 @@ import pandas as pd
 import numpy as np
 
 
-def digitize(df, col, limit) -> pd.Categorical: 
-    lower, upper = limit
-    # Get sorted unique non-NaN values from the column
-    unique_vals = sorted(df[col].dropna().unique())
-    # Combine with limits and remove duplicates to form bin edges
-    bin_edges = sorted(set([lower] + unique_vals + [upper]))
-    # Bin the data: closed on left, open on right, returns Categorical
-    digitized = pd.cut(df[col], bins=bin_edges, right=False)
-    return digitized
+def digitize(df, col, limit) -> pd.Categorical:
+    """
+    Convert a continuous variable into a categorical variable.
+    
+    Parameters:
+    -----------
+    df : pd.DataFrame
+        The dataframe containing the data
+    col : str
+        The column name of the variable to digitize
+    limit : tuple
+        The theoretical extent (lower_bound, upper_bound) of the variable
+        
+    Returns:
+    --------
+    pd.Categorical
+        A categorical representation of the variable with bins defined by unique values
+    """
+    # Extract the values from the dataframe column
+    values = df[col].dropna().unique()
+    
+    # Add the limit values if they're not already in the values
+    lower_bound, upper_bound = limit
+    
+    all_values = np.sort(np.unique(np.append(values, [lower_bound, upper_bound])))
+    
+    # Create bins from the unique values
+    bins = list(all_values) + [np.inf] # Captures max value
+    
+    # Digitize the data using the bins (closed='left' means bins are closed on the left and open on the right)
+    return pd.cut(df[col].values, bins=bins, include_lowest=True, right=False)
 
 
 def describe_digitized(y_digitized) -> pd.DataFrame:
     y_desc = y_digitized.describe()
     y_desc = y_desc.reset_index()
-    y_desc.loc[~y_desc.categories.isna(), 'left'] = y_digitized.categoriess.left
+    y_desc.loc[~y_desc.categories.isna(), 'left'] = y_digitized.categories.left
     y_desc.loc[~y_desc.categories.isna(), 'right'] = y_digitized.categories.right
     return y_desc
 
